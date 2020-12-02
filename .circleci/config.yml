@@ -53,6 +53,9 @@ jobs:
       - attach_workspace:
           at: /tmp
       - run:
+          name: Install netlify
+          command: sudo npm install netlify-cli -g
+      - run:
           name: Deploy app
           command: echo todo && false
   back-test-unit:
@@ -124,10 +127,11 @@ jobs:
           command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git main
       - run:
           name: Smoke Test
-          command: HTTPCODE=curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/
-                   if [[ "$HTTPCODE" -ne 200 ]]; then
-                     echo "heroku app not responding, failing deploy" \
-                     exit 1; \
+          command: HTTPCODE=`curl -s -o /dev/null -w "%{http_code}" https://$HEROKU_APP_NAME.herokuapp.com/`
+                   if [ "$HTTPCODE" -ne 200 ]
+                   then
+                       echo "heroku app not responding, failing deploy"
+                       exit 1
                    fi
 
 workflows:
